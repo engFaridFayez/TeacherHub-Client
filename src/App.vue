@@ -11,7 +11,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-cyan-200 dark:bg-slate-900">
+    <div>
         <RouterView />
     </div>
 </template>
