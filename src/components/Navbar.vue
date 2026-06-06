@@ -7,7 +7,7 @@ const isOpen = ref(false)
 </script>
 
 <template>
-  <nav class="dark:bg-slate-900 shadow-md">
+  <nav class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-md">
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
 

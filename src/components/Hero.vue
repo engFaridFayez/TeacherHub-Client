@@ -5,10 +5,10 @@ import CarouselBackgroundVideo from "./miniComponents/CarouselBackgroundVideo.vu
 
 <template>
     <div
-        class="relative bg-white dark:bg-white flex flex-col lg:flex-row lg:items-center justify-between px-6 md:px-12 py-12 md:py-16 overflow-hidden min-h-[90vh]">
+        class="relative bg-white dark:bg-white flex flex-col items-center lg:flex-row lg:items-center justify-between px-6 md:px-12 py-12 md:py-16 overflow-hidden min-h-auto">
 
         <!-- Background -->
-        <div class="absolute inset-0 z-0 max-h-[90vh]">
+        <div class="absolute inset-0 z-0 max-h-auto">
             <CarouselBackgroundVideo />
         </div>
 
@@ -16,7 +16,7 @@ import CarouselBackgroundVideo from "./miniComponents/CarouselBackgroundVideo.vu
         <div class="absolute inset-0 z-10 bg-black/40 dark:bg-black/55"></div>
 
         <!-- Image -->
-        <img class="relative z-20 image w-70 md:w-100 lg:w-auto lg:h-112.5 object-cover mb-8 lg:mb-0"
+        <img class="relative z-20 image w-150 md:w-170 lg:w-200 lg:mr-50 lg:h-auto object-cover mb-8 lg:mb-0"
             :src="hero" alt="Teacher Hero" />
 
         <!-- Text -->

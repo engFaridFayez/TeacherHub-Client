@@ -4,16 +4,15 @@ import { ref, onMounted, onUnmounted } from 'vue'
 // ── Colour palettes ──────────────────────────────────────────────
 // Light: cyan-50  (#ecfeff)   Dark: slate-900 (#0f172a)
 const PALETTE = {
-    light: {
-        bg: '#f0fdff',
-        dotFill: 'rgba(8, 145, 178, 0.55)',
-        lineFill: 'rgba(8, 145, 178, {a})',
-        symbolColor: (alpha: number) =>
-            `rgba(14, 165, 233, ${alpha})`,
-        gridLine: 'rgba(8, 145, 178, 0.14)',
-        orbitBorder: 'rgba(8, 145, 178, 0.25)',
-        vignette: 'rgba(224, 247, 250, 0.35)',
-    },
+light: {
+    bg: '#ffffff',
+    dotFill: 'rgba(8, 145, 178, 0.45)',       // lighter dots
+    lineFill: 'rgba(8, 145, 178, {a})',
+    symbolColor: (alpha: number) => `rgba(8, 145, 178, ${alpha})`,
+    gridLine: 'rgba(8, 145, 178, 0.10)',
+    orbitBorder: 'rgba(8, 145, 178, 0.4)',
+    vignette: 'rgba(220, 245, 255, 0.3)',
+},
 
     dark: {
         bg: '#0b1220',
@@ -28,18 +27,18 @@ const PALETTE = {
 }
 
 // ── Dark-mode detection ──────────────────────────────────────────
-const isDark = ref(document.documentElement.classList.contains('dark'))
+const isDark = ref(true)
 
 let modeObserver: MutationObserver | null = null
 
-function observeColorScheme() {
-    modeObserver = new MutationObserver(() => {
-        isDark.value = document.documentElement.classList.contains('dark')
-        applyBackground()
-        rebuildCanvas()
-    })
-    modeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-}
+// function observeColorScheme() {
+//     modeObserver = new MutationObserver(() => {
+//         isDark.value = document.documentElement.classList.contains('dark')
+//         applyBackground()
+//         rebuildCanvas()
+//     })
+//     modeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+// }
 
 function palette() { return isDark.value ? PALETTE.dark : PALETTE.light }
 
@@ -90,7 +89,9 @@ let raf: number | null = null
 // ── Apply background colour to container ─────────────────────────
 function applyBackground() {
     if (containerRef.value)
-        containerRef.value.style.background = palette().bg
+        containerRef.value.style.background = isDark.value
+            ? '#0b1220'
+            : '#ffffff'
 }
 
 // ── Floating symbols ─────────────────────────────────────────────
@@ -177,7 +178,7 @@ onMounted(() => {
     applyBackground()
     rebuildCanvas()
     floatInterval = setInterval(spawnSymbol, 400)
-    observeColorScheme()
+    // observeColorScheme()
 })
 
 onUnmounted(() => {
@@ -283,10 +284,9 @@ onUnmounted(() => {
 /* Light mode grid */
 .cbv-grid {
     background-image:
-        linear-gradient(rgba(8, 145, 178, 0.14) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(8, 145, 178, 0.14) 1px, transparent 1px);
+        linear-gradient(rgba(100, 200, 220, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(100, 200, 220, 0.12) 1px, transparent 1px);
 }
-
 /* Dark mode grid */
 :global(.dark) .cbv-grid {
     background-image:
@@ -299,12 +299,25 @@ onUnmounted(() => {
     position: absolute;
     border-radius: 50%;
     animation: cbvSpin linear infinite;
-    /* Light */
-    border: 1px solid rgb(101, 110, 241);
+
+    border: 2px solid rgba(8, 145, 178, 0.9);
+    box-shadow:
+        0 0 6px 2px rgba(8, 145, 178, 0.8),
+        0 0 18px 4px rgba(6, 182, 212, 0.55),
+        0 0 45px 10px rgba(6, 182, 212, 0.30),
+        inset 0 0 8px 2px rgba(8, 145, 178, 0.25);
 }
 
+/* Dark mode: pure white with strong glow */
 :global(.dark) .cbv-ring {
-    border: 1px solid rgb(255, 255, 255);
+    border: 2px solid rgba(255, 255, 255, 1);
+
+    box-shadow:
+        0 0 6px 2px rgba(255, 255, 255, 0.95),
+        0 0 20px 5px rgba(255, 255, 255, 0.65),
+        0 0 50px 10px rgba(120, 180, 255, 0.45),
+        0 0 80px 15px rgba(80, 140, 255, 0.2),
+        inset 0 0 8px 2px rgba(255, 255, 255, 0.3);
 }
 
 @keyframes cbvSpin {
@@ -323,8 +336,6 @@ onUnmounted(() => {
     inset: 0;
     pointer-events: none;
     z-index: 5;
-    /* Light: gentle cyan fade at edges */
-    background: radial-gradient(ellipse at center, transparent 35%, rgba(186, 230, 253, 0.55) 100%);
 }
 
 :global(.dark) .cbv-vignette {
@@ -347,7 +358,7 @@ onUnmounted(() => {
     top: -80px;
     left: -80px;
     /* Light: soft cyan */
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.20) 0%, transparent 70%);
 }
 
 :global(.dark) .cbv-blob--tl {
@@ -360,7 +371,7 @@ onUnmounted(() => {
     bottom: -100px;
     right: -80px;
     /* Light: soft sky blue */
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.10) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.18) 0%, transparent 70%);
     animation-delay: -4s;
 }
 
@@ -402,8 +413,8 @@ onUnmounted(() => {
     letter-spacing: 2px;
     animation: cbvTitlePulse 4s ease-in-out infinite;
     /* Light: deep cyan */
-    color: #0e7490;
-    text-shadow: 0 0 30px rgba(6, 182, 212, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08);
+    color: #a8f0e8;
+    text-shadow: 0 0 40px rgba(100, 220, 210, 0.6), 0 0 80px rgba(60, 180, 220, 0.3);
 }
 
 :global(.dark) .cbv-title {
@@ -429,7 +440,7 @@ onUnmounted(() => {
     letter-spacing: 6px;
     text-transform: uppercase;
     /* Light */
-    color: rgba(8, 145, 178, 0.75);
+    color: rgba(140, 230, 255, 0.8);
 }
 
 :global(.dark) .cbv-subtitle {
@@ -463,9 +474,9 @@ onUnmounted(() => {
     font-size: 13px;
     font-family: 'Fira Code', monospace;
     /* Light */
-    background: rgba(6, 182, 212, 0.10);
-    border: 1px solid rgba(6, 182, 212, 0.30);
-    color: rgba(8, 145, 178, 0.90);
+background: rgba(80, 200, 220, 0.12);
+    border: 1px solid rgba(100, 220, 240, 0.35);
+    color: rgba(160, 240, 255, 0.9);
 }
 
 :global(.dark) .cbv-pill {

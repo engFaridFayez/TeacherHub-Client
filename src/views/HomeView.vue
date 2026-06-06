@@ -7,13 +7,10 @@ import Footer from '@/components/Footer.vue';
 
 
 <template>
-    <div class="bg-cyan-50 dark:bg-slate-900">
+    <div class="bg-cyan-50 dark:bg-slate-900 min-h-screen">
         <Navbar />
-    </div>
-    <Hero />
-    <div class="bg-cyan-50 dark:bg-slate-900">
+        <Hero />
         <Stages />
         <Footer />
     </div>
-
 </template>
