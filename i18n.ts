@@ -4,6 +4,7 @@ import en from "@/locales/en.json"
 import ar from "@/locales/ar.json"
 
 export default createI18n({
+    legacy: false,
     locale: "ar",
     fallbackLocale: "ar",
     messages:{
