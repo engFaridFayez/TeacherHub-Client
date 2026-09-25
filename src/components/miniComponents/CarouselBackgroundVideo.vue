@@ -29,8 +29,6 @@ light: {
 // ── Dark-mode detection ──────────────────────────────────────────
 const isDark = ref(true)
 
-let modeObserver: MutationObserver | null = null
-
 // function observeColorScheme() {
 //     modeObserver = new MutationObserver(() => {
 //         isDark.value = document.documentElement.classList.contains('dark')
@@ -67,13 +65,15 @@ const themes = [
 ]
 
 const themeIdx = ref(0)
-const currentTitle = ref(themes[0].title)
-const currentSub = ref(themes[0].sub)
-const currentPills = ref([...themes[0].pills])
+const initialTheme = themes[0]!
+const currentTitle = ref(initialTheme.title)
+const currentSub = ref(initialTheme.sub)
+const currentPills = ref([...initialTheme.pills])
 
 function cycleTitle() {
     themeIdx.value = (themeIdx.value + 1) % themes.length
     const t = themes[themeIdx.value]
+    if (!t) return
     currentTitle.value = t.title
     currentSub.value = t.sub
     currentPills.value = [...t.pills]
@@ -96,10 +96,14 @@ function applyBackground() {
 
 // ── Floating symbols ─────────────────────────────────────────────
 function spawnSymbol() {
-    if (!containerRef.value) return
+    const container = containerRef.value
+    if (!container) return
+    const symbol = mathSymbols[Math.floor(Math.random() * mathSymbols.length)]
+    if (!symbol) return
+
     const el = document.createElement('div')
     el.className = 'cbv-float-symbol'
-    el.textContent = mathSymbols[Math.floor(Math.random() * mathSymbols.length)]
+    el.textContent = symbol
     el.style.left = Math.random() * 92 + '%'
     el.style.bottom = '-30px'
     const dur = 9 + Math.random() * 10
@@ -107,7 +111,7 @@ function spawnSymbol() {
     el.style.fontSize = (11 + Math.random() * 6) + 'px'
     const alpha = 0.08 + Math.random() * 0.22
     el.style.color = palette().symbolColor(alpha)
-    containerRef.value.appendChild(el)
+    container.appendChild(el)
     setTimeout(() => el.remove(), dur * 1000 + 500)
 }
 
@@ -122,49 +126,57 @@ function rebuildCanvas() {
     // cancel current loop
     if (raf) { cancelAnimationFrame(raf); raf = null }
 
-    canvas.width = container.offsetWidth
-    canvas.height = container.offsetHeight
+    const width = container.offsetWidth
+    const height = container.offsetHeight
+    canvas.width = width
+    canvas.height = height
 
     dots = Array.from({ length: 55 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
+        x: Math.random() * width,
+        y: Math.random() * height,
         vx: (Math.random() - 0.5) * 0.30,
         vy: (Math.random() - 0.5) * 0.30,
         r: 1 + Math.random() * 1.5,
     }))
 
-    const ctx = canvas.getContext('2d')!
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const context: CanvasRenderingContext2D = ctx
 
     function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        context.clearRect(0, 0, width, height)
         const p = palette()
 
         dots.forEach(d => {
             d.x += d.vx; d.y += d.vy
-            if (d.x < 0) d.x = canvas.width
-            if (d.x > canvas.width) d.x = 0
-            if (d.y < 0) d.y = canvas.height
-            if (d.y > canvas.height) d.y = 0
+            if (d.x < 0) d.x = width
+            if (d.x > width) d.x = 0
+            if (d.y < 0) d.y = height
+            if (d.y > height) d.y = 0
 
-            ctx.beginPath()
-            ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2)
-            ctx.fillStyle = p.dotFill
-            ctx.fill()
+            context.beginPath()
+            context.arc(d.x, d.y, d.r, 0, Math.PI * 2)
+            context.fillStyle = p.dotFill
+            context.fill()
         })
 
         for (let i = 0; i < dots.length; i++) {
             for (let j = i + 1; j < dots.length; j++) {
-                const dx = dots[i].x - dots[j].x
-                const dy = dots[i].y - dots[j].y
+                const firstDot = dots[i]
+                const secondDot = dots[j]
+                if (!firstDot || !secondDot) continue
+
+                const dx = firstDot.x - secondDot.x
+                const dy = firstDot.y - secondDot.y
                 const dist = Math.sqrt(dx * dx + dy * dy)
                 if (dist < 100) {
                     const a = 0.25 * (1 - dist / 100)
-                    ctx.beginPath()
-                    ctx.moveTo(dots[i].x, dots[i].y)
-                    ctx.lineTo(dots[j].x, dots[j].y)
-                    ctx.strokeStyle = p.lineFill.replace('{a}', String(a))
-                    ctx.lineWidth = 0.5
-                    ctx.stroke()
+                    context.beginPath()
+                    context.moveTo(firstDot.x, firstDot.y)
+                    context.lineTo(secondDot.x, secondDot.y)
+                    context.strokeStyle = p.lineFill.replace('{a}', String(a))
+                    context.lineWidth = 0.5
+                    context.stroke()
                 }
             }
         }
@@ -184,7 +196,6 @@ onMounted(() => {
 onUnmounted(() => {
     if (floatInterval) clearInterval(floatInterval)
     if (raf) cancelAnimationFrame(raf)
-    if (modeObserver) modeObserver.disconnect()
 })
 </script>
 
