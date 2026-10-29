@@ -29,6 +29,9 @@ const isOpen = ref(false)
           <router-link to="/register" class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
             {{ $t('nav.sign') }}
           </router-link>
+          <router-link to="/stages" class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+            المراحل
+          </router-link>
 
           <ThemeToggleButton />
           <LanguageToggleButton />
