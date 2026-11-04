@@ -23,19 +23,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && error.response?.status === 401) {
+        if (error.response?.status === 401) {
 
             const hadToken = !!localStorage.getItem("access");
 
-            // 🧹 cleanup
-            localStorage.removeItem("access");
-            localStorage.removeItem("refresh");
+            if(hadToken) {
+                localStorage.removeItem("access");
+                localStorage.removeItem("refresh");
 
-            if (hadToken) {
                 sessionExpired.value = true;
+
+                window.location.href = "/login"
             }
-            
-            window.location.href = "/login";
 
         }
 

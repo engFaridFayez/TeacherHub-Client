@@ -9,6 +9,9 @@ const router = createRouter({
       path:'/',
       name:"home",
       component: () => import("@/views/HomeView.vue"),
+      meta:{
+        requireAuth:false
+      }
     },
     {
       path:'/register',
@@ -31,7 +34,7 @@ const router = createRouter({
       name:'stages',
       component:() => import("@/views/stages/ListStagesView.vue"),
       meta:{
-        requireAuth:true
+        requireAuth:false
       },
     },
   ],
