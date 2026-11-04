@@ -8,6 +8,8 @@ const api = axios.create({
     }
 });
 
+
+
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access");
 
@@ -32,8 +34,9 @@ api.interceptors.response.use(
             if (hadToken) {
                 sessionExpired.value = true;
             }
+            
+            window.location.href = "/login";
 
-            return Promise.reject(error);
         }
 
         return Promise.reject(error);

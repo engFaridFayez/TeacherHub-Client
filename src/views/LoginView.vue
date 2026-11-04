@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter,useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const router = useRouter();
-
+const route = useRoute()
 const username = ref("");
 const password = ref("");
 
@@ -22,7 +22,13 @@ const handleLogin = async () => {
             password.value
         );
 
-        router.push("/");
+        const redirect = route.query.redirect;
+
+        if(typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//")) {
+            await router.replace(redirect)
+        }else {
+            await router.replace({name: "home"})
+        }
     } catch (err: any) {
         error.value =
             err.response?.data?.detail ||

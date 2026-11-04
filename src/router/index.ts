@@ -1,27 +1,59 @@
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import ListStagesView from '@/views/stages/ListStagesView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+
   routes: [
     {
       path:'/',
-      name:"Home",
-      component:HomeView
+      name:"home",
+      component: () => import("@/views/HomeView.vue"),
+    },
+    {
+      path:'/register',
+      name:'register',
+      component: () => import("@/views/RegisterView.vue"),
+      meta:{
+        guestOnly: true
+      }
     },
     {
       path:'/login',
       name:"login",
-      component:LoginView
+      component:() => import("@/views/LoginView.vue"),
+      meta: {
+        guestOnly: true
+      }
     },
     {
       path:'/stages',
       name:'stages',
-      component:ListStagesView
-    }
+      component:() => import("@/views/stages/ListStagesView.vue"),
+      meta:{
+        requireAuth:true
+      },
+    },
   ],
 })
+
+router.beforeEach((to) => {
+    const token = localStorage.getItem("access");
+
+    if (to.meta.requireAuth && !token) {
+        return {
+            name: "login",
+            query: {
+                redirect: to.fullPath
+            }
+        };
+    }
+
+    if (to.meta.guestOnly && token) {
+        return { name: "home" };
+    }
+
+    return true;
+});
 
 export default router
